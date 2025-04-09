@@ -21,9 +21,10 @@ export default function Header() {
         
         {/* Desktop Navigation */}
         <nav className="hidden md:flex space-x-6">
-          <Link href="/" className="font-medium text-gray-700 hover:text-primary transition-colors">Home</Link>
-          <Link href="/mission" className="font-medium text-gray-700 hover:text-primary transition-colors">Mission</Link>
-          <Link href="/faq" className="font-medium text-gray-700 hover:text-primary transition-colors">FAQ</Link>
+          <a href="#" className="font-medium text-gray-700 hover:text-primary transition-colors">Home</a>
+          <a href="#calculators" className="font-medium text-gray-700 hover:text-primary transition-colors">Calculators</a>
+          <a href="#about" className="font-medium text-gray-700 hover:text-primary transition-colors">About</a>
+          <a href="#faq" className="font-medium text-gray-700 hover:text-primary transition-colors">FAQ</a>
         </nav>
         
         {/* Mobile Navigation Button */}
@@ -44,27 +45,34 @@ export default function Header() {
       {isMobileMenuOpen && (
         <div className="md:hidden bg-white border-t border-gray-100">
           <div className="container mx-auto px-4 py-3 space-y-3">
-            <Link 
-              href="/" 
+            <a 
+              href="#" 
               className="block font-medium text-gray-700 hover:text-primary transition-colors"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Home
-            </Link>
-            <Link 
-              href="/mission" 
+            </a>
+            <a 
+              href="#calculators" 
               className="block font-medium text-gray-700 hover:text-primary transition-colors"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              Mission
-            </Link>
-            <Link 
-              href="/faq" 
+              Calculators
+            </a>
+            <a 
+              href="#about" 
+              className="block font-medium text-gray-700 hover:text-primary transition-colors"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              About
+            </a>
+            <a 
+              href="#faq" 
               className="block font-medium text-gray-700 hover:text-primary transition-colors"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               FAQ
-            </Link>
+            </a>
           </div>
         </div>
       )}
