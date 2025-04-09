@@ -11,6 +11,15 @@ import FAQ from "@/pages/FAQ";
 import { ModalProvider } from "./contexts/ModalContext";
 import { Helmet } from "react-helmet";
 
+// Calculator page imports
+import BMICalculatorPage from "@/pages/calculators/BMICalculator";
+import IdealWeightCalculatorPage from "@/pages/calculators/IdealWeightCalculator";
+import CalorieCalculatorPage from "@/pages/calculators/CalorieCalculator";
+import BodyFatCalculatorPage from "@/pages/calculators/BodyFatCalculator";
+import HeartRateCalculatorPage from "@/pages/calculators/HeartRateCalculator";
+import WeightTimelineCalculatorPage from "@/pages/calculators/WeightTimelineCalculator";
+import WaistHipCalculatorPage from "@/pages/calculators/WaistHipCalculator";
+
 function Router() {
   return (
     <Switch>
@@ -19,6 +28,16 @@ function Router() {
       <Route path="/privacy" component={Privacy} />
       <Route path="/terms" component={Terms} />
       <Route path="/faq" component={FAQ} />
+      
+      {/* Calculator Routes */}
+      <Route path="/calculators/bmi" component={BMICalculatorPage} />
+      <Route path="/calculators/ideal-weight" component={IdealWeightCalculatorPage} />
+      <Route path="/calculators/calorie" component={CalorieCalculatorPage} />
+      <Route path="/calculators/body-fat" component={BodyFatCalculatorPage} />
+      <Route path="/calculators/heart-rate" component={HeartRateCalculatorPage} />
+      <Route path="/calculators/weight-timeline" component={WeightTimelineCalculatorPage} />
+      <Route path="/calculators/waist-hip" component={WaistHipCalculatorPage} />
+      
       <Route component={NotFound} />
     </Switch>
   );

@@ -1,21 +1,51 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { AlertCircle } from "lucide-react";
+import { Link } from 'wouter';
+import PageLayout from '@/components/layout/PageLayout';
+import { Button } from '@/components/ui/button';
+import { motion } from 'framer-motion';
+import { Home } from 'lucide-react';
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gray-50">
-      <Card className="w-full max-w-md mx-4">
-        <CardContent className="pt-6">
-          <div className="flex mb-4 gap-2">
-            <AlertCircle className="h-8 w-8 text-red-500" />
-            <h1 className="text-2xl font-bold text-gray-900">404 Page Not Found</h1>
-          </div>
-
-          <p className="mt-4 text-sm text-gray-600">
-            Did you forget to add the page to the router?
+    <PageLayout 
+      title="Page Not Found" 
+      description="We couldn't find the page you were looking for."
+    >
+      <div className="flex flex-col items-center justify-center min-h-[50vh] text-center px-4">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <h1 className="text-9xl font-bold text-primary">404</h1>
+          <h2 className="text-3xl font-semibold mt-6 mb-2">Page Not Found</h2>
+          <p className="text-gray-600 max-w-md mx-auto mb-8">
+            Sorry, we couldn't find the page you were looking for. It might have been moved or deleted.
           </p>
-        </CardContent>
-      </Card>
-    </div>
+          
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button 
+              asChild
+              size="lg"
+              className="gap-2"
+            >
+              <Link href="/">
+                <Home className="h-5 w-5" />
+                Return Home
+              </Link>
+            </Button>
+            
+            <Button 
+              asChild
+              variant="outline" 
+              size="lg"
+            >
+              <Link href="/#calculators">
+                Browse Calculators
+              </Link>
+            </Button>
+          </div>
+        </motion.div>
+      </div>
+    </PageLayout>
   );
 }
