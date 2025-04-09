@@ -29,10 +29,10 @@ export default function Footer() {
             <div>
               <h3 className="font-sans font-semibold text-lg mb-4">About</h3>
               <ul className="space-y-2">
-                <li><a href="#about" className="text-gray-400 hover:text-white transition-colors">Our Mission</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Privacy Policy</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Terms of Use</a></li>
-                <li><a href="#faq" className="text-gray-400 hover:text-white transition-colors">FAQ</a></li>
+                <li><a href="/mission" className="text-gray-400 hover:text-white transition-colors">Our Mission</a></li>
+                <li><a href="/privacy" className="text-gray-400 hover:text-white transition-colors">Privacy Policy</a></li>
+                <li><a href="/terms" className="text-gray-400 hover:text-white transition-colors">Terms of Use</a></li>
+                <li><a href="/faq" className="text-gray-400 hover:text-white transition-colors">FAQ</a></li>
               </ul>
             </div>
             
