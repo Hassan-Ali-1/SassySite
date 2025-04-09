@@ -13,7 +13,7 @@ export default function Terms() {
     >
       <div className="container mx-auto px-4 py-12">
         {/* Hero section */}
-        <div className="bg-gradient-to-r from-primary to-primary-foreground text-white py-12 mb-12">
+        <div className="bg-green-100 text-gray-800 py-12 mb-12">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -21,10 +21,10 @@ export default function Terms() {
             className="max-w-3xl mx-auto text-center px-4"
           >
             <div className="flex justify-center mb-4">
-              <FileWarning className="h-16 w-16" />
+              <FileWarning className="h-16 w-16 text-primary" />
             </div>
             <h1 className="text-3xl md:text-4xl font-bold mb-4">Terms of Use</h1>
-            <p className="text-xl text-white/90">
+            <p className="text-xl text-gray-700">
               Guidelines for using FitCalc's health calculators responsibly
             </p>
           </motion.div>

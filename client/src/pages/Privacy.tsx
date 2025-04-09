@@ -20,7 +20,7 @@ export default function Privacy() {
     >
       <div className="container mx-auto px-4 py-12">
         {/* Hero section */}
-        <div className="bg-gradient-to-r from-primary to-primary-foreground text-white py-12 mb-12">
+        <div className="bg-green-100 text-gray-800 py-12 mb-12">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -28,10 +28,10 @@ export default function Privacy() {
             className="max-w-3xl mx-auto text-center px-4"
           >
             <div className="flex justify-center mb-4">
-              <ShieldCheck className="h-16 w-16" />
+              <ShieldCheck className="h-16 w-16 text-primary" />
             </div>
             <h1 className="text-3xl md:text-4xl font-bold mb-4">Privacy Policy</h1>
-            <p className="text-xl text-white/90">
+            <p className="text-xl text-gray-700">
               Your privacy is our priority. We've designed FitCalc with privacy at its core.
             </p>
           </motion.div>

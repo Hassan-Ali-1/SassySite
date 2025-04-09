@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 
 export default function Hero() {
   return (
-    <section className="bg-gradient-to-r from-primary to-primary-foreground text-white py-16 md:py-24">
+    <section className="bg-green-100 text-gray-800 py-16 md:py-24">
       <div className="container mx-auto px-4">
         <div className="max-w-3xl mx-auto text-center">
           <motion.h1 
@@ -17,7 +17,7 @@ export default function Hero() {
           </motion.h1>
           
           <motion.p 
-            className="text-xl md:text-2xl mb-8 text-white/90"
+            className="text-xl md:text-2xl mb-8 text-gray-700"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}

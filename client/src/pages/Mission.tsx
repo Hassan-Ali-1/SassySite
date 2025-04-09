@@ -12,7 +12,7 @@ export default function Mission() {
     >
       <div className="container mx-auto px-4 py-12">
         {/* Hero section */}
-        <div className="bg-gradient-to-r from-primary to-primary-foreground text-white py-12 mb-12">
+        <div className="bg-green-100 text-gray-800 py-12 mb-12">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -20,7 +20,7 @@ export default function Mission() {
             className="max-w-3xl mx-auto text-center px-4"
           >
             <h1 className="text-3xl md:text-4xl font-bold mb-4">Our Mission</h1>
-            <p className="text-xl text-white/90 mb-6">
+            <p className="text-xl text-gray-700 mb-6">
               Empowering your health journey with accessible, accurate, and privacy-focused tools.
             </p>
           </motion.div>
