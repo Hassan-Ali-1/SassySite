@@ -4,6 +4,10 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
+import Mission from "@/pages/Mission";
+import Privacy from "@/pages/Privacy";
+import Terms from "@/pages/Terms";
+import FAQ from "@/pages/FAQ";
 import { ModalProvider } from "./contexts/ModalContext";
 import { Helmet } from "react-helmet";
 
@@ -11,6 +15,10 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
+      <Route path="/mission" component={Mission} />
+      <Route path="/privacy" component={Privacy} />
+      <Route path="/terms" component={Terms} />
+      <Route path="/faq" component={FAQ} />
       <Route component={NotFound} />
     </Switch>
   );
