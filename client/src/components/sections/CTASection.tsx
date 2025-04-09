@@ -10,7 +10,7 @@ export default function CTASection() {
           <Button 
             variant="outline" 
             size="lg"
-            className="bg-white text-primary-600 font-medium px-6 py-3 rounded-lg hover:bg-gray-100 transition-colors shadow-lg"
+            className="bg-white text-primary hover:bg-gray-100 transition-colors shadow-lg"
           >
             Try Our Calculators
           </Button>
