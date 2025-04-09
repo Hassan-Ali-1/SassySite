@@ -1,34 +1,12 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
-import { Share2 } from 'lucide-react';
+import { Share2, Calendar, ArrowRight } from 'lucide-react';
 import { calculateWeightTimeline } from '@/lib/calculatorUtils';
-import { createWeightTimelineChart } from '@/lib/chartUtils';
-import { 
-  Chart, 
-  CategoryScale, 
-  LinearScale, 
-  PointElement, 
-  LineElement, 
-  Title, 
-  Tooltip, 
-  Legend 
-} from 'chart.js';
-
-// Register ChartJS components
-Chart.register(
-  CategoryScale, 
-  LinearScale, 
-  PointElement, 
-  LineElement, 
-  Title, 
-  Tooltip, 
-  Legend
-);
 
 interface TimelineResult {
   totalDays: number;
@@ -46,9 +24,6 @@ export default function WeightTimelineCalculator() {
   const [calorieDeficit, setCalorieDeficit] = useState<number>(500);
   const [timelineResult, setTimelineResult] = useState<TimelineResult | null>(null);
   const [showResults, setShowResults] = useState(false);
-
-  const chartRef = useRef<HTMLCanvasElement>(null);
-  const chartInstanceRef = useRef<Chart | null>(null);
 
   const handleCalculate = (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,29 +49,34 @@ export default function WeightTimelineCalculator() {
     setShowResults(true);
   };
 
-  useEffect(() => {
-    if (showResults && timelineResult !== null && chartRef.current) {
-      // Clean up previous chart instance
-      if (chartInstanceRef.current) {
-        chartInstanceRef.current.destroy();
-      }
-      
-      // Create new chart
-      const ctx = chartRef.current.getContext('2d');
-      if (ctx) {
-        chartInstanceRef.current = createWeightTimelineChart(ctx, timelineResult);
-      }
-    }
-    
-    // Clean up chart on component unmount
-    return () => {
-      if (chartInstanceRef.current) {
-        chartInstanceRef.current.destroy();
-      }
-    };
-  }, [showResults, timelineResult]);
-
   const isWeightLoss = goalWeight && currentWeight ? parseFloat(goalWeight) < parseFloat(currentWeight) : true;
+
+  // Helper function to format date nicely
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    });
+  };
+
+  // Generate timeline preview points
+  const getTimelinePreview = () => {
+    if (!timelineResult) return [];
+    
+    const { totalWeeks, weeklyData } = timelineResult;
+    
+    // Get points along the journey - start, 25%, 50%, 75%, goal
+    const points = [
+      { label: 'Start', week: 0, weight: weeklyData[0].weight },
+      { label: '25%', week: Math.floor(totalWeeks * 0.25), weight: weeklyData[Math.min(Math.floor(totalWeeks * 0.25), weeklyData.length - 1)].weight },
+      { label: '50%', week: Math.floor(totalWeeks * 0.5), weight: weeklyData[Math.min(Math.floor(totalWeeks * 0.5), weeklyData.length - 1)].weight },
+      { label: '75%', week: Math.floor(totalWeeks * 0.75), weight: weeklyData[Math.min(Math.floor(totalWeeks * 0.75), weeklyData.length - 1)].weight },
+      { label: 'Goal', week: totalWeeks, weight: weeklyData[weeklyData.length - 1].weight }
+    ];
+    
+    return points;
+  };
 
   return (
     <div className="flex flex-col md:flex-row gap-8">
@@ -217,18 +197,15 @@ export default function WeightTimelineCalculator() {
                 
                 <div className="flex justify-between items-center">
                   <span className="text-gray-700">Target Date:</span>
-                  <span className="font-medium">
-                    {timelineResult.targetDate.toLocaleDateString('en-US', { 
-                      year: 'numeric', 
-                      month: 'long', 
-                      day: 'numeric' 
-                    })}
+                  <span className="font-medium flex items-center gap-2">
+                    <Calendar className="h-4 w-4 text-purple-500" />
+                    {formatDate(timelineResult.targetDate)}
                   </span>
                 </div>
                 
                 <div className="flex justify-between items-center">
                   <span className="text-gray-700">Total Weight Change:</span>
-                  <span className="font-medium">
+                  <span className="font-medium text-purple-600">
                     {Math.abs(parseFloat(goalWeight) - parseFloat(currentWeight)).toFixed(1)} {weightUnit}
                   </span>
                 </div>
@@ -238,6 +215,38 @@ export default function WeightTimelineCalculator() {
                   <span className="font-medium">
                     {(calorieDeficit * 7 / (weightUnit === 'kg' ? 7700 : 3500)).toFixed(2)} {weightUnit}/week
                   </span>
+                </div>
+              </div>
+              
+              {/* Custom timeline visualization */}
+              <div className="mt-8">
+                <h4 className="font-sans font-semibold text-gray-700 mb-4">Weight Journey Timeline</h4>
+                
+                <div className="relative pt-8 pb-2">
+                  {/* Timeline line */}
+                  <div className="absolute top-14 left-0 right-0 h-1 bg-purple-200 z-0"></div>
+                  
+                  {/* Timeline points */}
+                  <div className="relative flex justify-between">
+                    {getTimelinePreview().map((point, index) => (
+                      <div key={index} className="flex flex-col items-center">
+                        <div className="absolute top-0 text-sm font-medium">
+                          {point.weight.toFixed(1)} {weightUnit}
+                        </div>
+                        <div className={`w-5 h-5 rounded-full ${index === 0 ? 'bg-purple-300' : index === getTimelinePreview().length - 1 ? 'bg-purple-600' : 'bg-purple-400'} z-10 mt-8`}></div>
+                        <div className="text-xs mt-2 text-gray-600">{point.label}</div>
+                        {index < getTimelinePreview().length - 1 && (
+                          <div className="text-xs mt-1 text-gray-500">
+                            {point.week !== getTimelinePreview()[index+1].week ? 
+                              `Week ${point.week}` : ''}
+                          </div>
+                        )}
+                        {index === getTimelinePreview().length - 1 && (
+                          <div className="text-xs mt-1 text-gray-500">Week {point.week}</div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
               
@@ -253,11 +262,7 @@ export default function WeightTimelineCalculator() {
                   className="text-purple-500 hover:text-purple-600 font-medium text-sm flex items-center"
                   onClick={() => {
                     // Share results functionality
-                    const text = `I should reach my goal weight by ${timelineResult.targetDate.toLocaleDateString('en-US', { 
-                      year: 'numeric', 
-                      month: 'long', 
-                      day: 'numeric' 
-                    })}. Plan your weight journey at FitCalc!`;
+                    const text = `I should reach my goal weight by ${formatDate(timelineResult.targetDate)}. Plan your weight journey at FitCalc!`;
                     if (navigator.share) {
                       navigator.share({
                         title: 'My Weight Timeline Results',
@@ -275,12 +280,6 @@ export default function WeightTimelineCalculator() {
               </div>
             </CardContent>
           </Card>
-        )}
-        
-        {showResults && (
-          <div className="mt-4">
-            <canvas ref={chartRef} height="300"></canvas>
-          </div>
         )}
       </div>
     </div>

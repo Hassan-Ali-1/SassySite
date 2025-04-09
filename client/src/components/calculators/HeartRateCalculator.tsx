@@ -1,15 +1,10 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { Share2 } from 'lucide-react';
 import { calculateHeartRateZones } from '@/lib/calculatorUtils';
-import { createHeartRateChart } from '@/lib/chartUtils';
-import { Chart, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
-
-// Register ChartJS components
-Chart.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 interface HeartRateZones {
   maxHR: number;
@@ -27,9 +22,6 @@ export default function HeartRateCalculator() {
   const [restingHR, setRestingHR] = useState<string>('');
   const [heartRateZones, setHeartRateZones] = useState<HeartRateZones | null>(null);
   const [showResults, setShowResults] = useState(false);
-
-  const chartRef = useRef<HTMLCanvasElement>(null);
-  const chartInstanceRef = useRef<Chart | null>(null);
 
   const handleCalculate = (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,27 +44,29 @@ export default function HeartRateCalculator() {
     setShowResults(true);
   };
 
-  useEffect(() => {
-    if (showResults && heartRateZones !== null && chartRef.current) {
-      // Clean up previous chart instance
-      if (chartInstanceRef.current) {
-        chartInstanceRef.current.destroy();
-      }
-      
-      // Create new chart
-      const ctx = chartRef.current.getContext('2d');
-      if (ctx) {
-        chartInstanceRef.current = createHeartRateChart(ctx, heartRateZones);
-      }
+  // Helper function to get a color for each heart rate zone
+  const getZoneColor = (zone: string) => {
+    switch (zone) {
+      case 'rest': return 'bg-blue-200';
+      case 'warmUp': return 'bg-green-200';
+      case 'fatBurn': return 'bg-green-500';
+      case 'cardio': return 'bg-orange-300';
+      case 'peak': return 'bg-red-300';
+      default: return 'bg-gray-200';
     }
-    
-    // Clean up chart on component unmount
-    return () => {
-      if (chartInstanceRef.current) {
-        chartInstanceRef.current.destroy();
-      }
-    };
-  }, [showResults, heartRateZones]);
+  };
+
+  // Helper function to get text color for each heart rate zone
+  const getZoneTextColor = (zone: string) => {
+    switch (zone) {
+      case 'rest': return 'text-blue-600';
+      case 'warmUp': return 'text-green-600';
+      case 'fatBurn': return 'text-green-700';
+      case 'cardio': return 'text-orange-600';
+      case 'peak': return 'text-red-600';
+      default: return 'text-gray-700';
+    }
+  };
 
   return (
     <div className="flex flex-col md:flex-row gap-8">
@@ -143,52 +137,152 @@ export default function HeartRateCalculator() {
                 <div className="space-y-3">
                   <div>
                     <div className="flex justify-between mb-1">
-                      <span className="text-gray-700">Resting</span>
+                      <span className={`${getZoneTextColor('rest')} font-medium`}>Resting</span>
                       <span className="font-medium">{heartRateZones.zones.rest} bpm</span>
                     </div>
-                    <div className="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
-                      <div className="bg-blue-200 h-full" style={{ width: `${(heartRateZones.zones.rest / heartRateZones.maxHR) * 100}%` }}></div>
+                    <div className="w-full bg-gray-200 h-3 rounded-full overflow-hidden">
+                      <div className={`${getZoneColor('rest')} h-full`} style={{ width: `${(heartRateZones.zones.rest / heartRateZones.maxHR) * 100}%` }}></div>
                     </div>
                   </div>
                   
                   <div>
                     <div className="flex justify-between mb-1">
-                      <span className="text-gray-700">Warm Up (50-60%)</span>
+                      <span className={`${getZoneTextColor('warmUp')} font-medium`}>Warm Up (50-60%)</span>
                       <span className="font-medium">{heartRateZones.zones.warmUp[0]} - {heartRateZones.zones.warmUp[1]} bpm</span>
                     </div>
-                    <div className="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
-                      <div className="bg-green-200 h-full" style={{ width: `${(heartRateZones.zones.warmUp[1] / heartRateZones.maxHR) * 100}%` }}></div>
+                    <div className="w-full bg-gray-200 h-3 rounded-full overflow-hidden">
+                      <div className={`${getZoneColor('warmUp')} h-full`} style={{ width: `${(heartRateZones.zones.warmUp[1] / heartRateZones.maxHR) * 100}%` }}></div>
                     </div>
                   </div>
                   
                   <div>
                     <div className="flex justify-between mb-1">
-                      <span className="text-gray-700 font-semibold">Fat Burning (60-70%)</span>
+                      <span className={`${getZoneTextColor('fatBurn')} font-semibold`}>Fat Burning (60-70%)</span>
                       <span className="font-semibold">{heartRateZones.zones.fatBurn[0]} - {heartRateZones.zones.fatBurn[1]} bpm</span>
                     </div>
-                    <div className="w-full bg-gray-200 h-4 rounded-full overflow-hidden">
-                      <div className="bg-primary h-full" style={{ width: `${(heartRateZones.zones.fatBurn[1] / heartRateZones.maxHR) * 100}%` }}></div>
+                    <div className="w-full bg-gray-200 h-5 rounded-full overflow-hidden">
+                      <div className={`${getZoneColor('fatBurn')} h-full`} style={{ width: `${(heartRateZones.zones.fatBurn[1] / heartRateZones.maxHR) * 100}%` }}></div>
                     </div>
                   </div>
                   
                   <div>
                     <div className="flex justify-between mb-1">
-                      <span className="text-gray-700">Cardio (70-85%)</span>
+                      <span className={`${getZoneTextColor('cardio')} font-medium`}>Cardio (70-85%)</span>
                       <span className="font-medium">{heartRateZones.zones.cardio[0]} - {heartRateZones.zones.cardio[1]} bpm</span>
                     </div>
-                    <div className="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
-                      <div className="bg-orange-300 h-full" style={{ width: `${(heartRateZones.zones.cardio[1] / heartRateZones.maxHR) * 100}%` }}></div>
+                    <div className="w-full bg-gray-200 h-3 rounded-full overflow-hidden">
+                      <div className={`${getZoneColor('cardio')} h-full`} style={{ width: `${(heartRateZones.zones.cardio[1] / heartRateZones.maxHR) * 100}%` }}></div>
                     </div>
                   </div>
                   
                   <div>
                     <div className="flex justify-between mb-1">
-                      <span className="text-gray-700">Peak (85-100%)</span>
+                      <span className={`${getZoneTextColor('peak')} font-medium`}>Peak (85-100%)</span>
                       <span className="font-medium">{heartRateZones.zones.peak[0]} - {heartRateZones.zones.peak[1]} bpm</span>
                     </div>
-                    <div className="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
-                      <div className="bg-red-300 h-full" style={{ width: `${(heartRateZones.zones.peak[1] / heartRateZones.maxHR) * 100}%` }}></div>
+                    <div className="w-full bg-gray-200 h-3 rounded-full overflow-hidden">
+                      <div className={`${getZoneColor('peak')} h-full`} style={{ width: `${(heartRateZones.zones.peak[1] / heartRateZones.maxHR) * 100}%` }}></div>
                     </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Heart rate zone visualization */}
+              <div className="mt-8 flex justify-center">
+                <div className="w-64 h-64 relative flex items-center justify-center">
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <svg viewBox="0 0 100 100" className="w-full h-full">
+                      {/* Background circle */}
+                      <circle cx="50" cy="50" r="45" fill="none" stroke="#e5e7eb" strokeWidth="10" />
+                      
+                      {/* Zone arcs */}
+                      <circle 
+                        cx="50" 
+                        cy="50" 
+                        r="45" 
+                        fill="none" 
+                        stroke="#bfdbfe" 
+                        strokeWidth="10" 
+                        strokeDasharray={`${(0.1 * Math.PI * 90)} ${2 * Math.PI * 45}`} 
+                        strokeDashoffset="0" 
+                        transform="rotate(-90 50 50)"
+                      />
+                      <circle 
+                        cx="50" 
+                        cy="50" 
+                        r="45" 
+                        fill="none" 
+                        stroke="#bbf7d0" 
+                        strokeWidth="10" 
+                        strokeDasharray={`${(0.1 * Math.PI * 90)} ${2 * Math.PI * 45}`} 
+                        strokeDashoffset={`${-0.1 * Math.PI * 90}`} 
+                        transform="rotate(-90 50 50)"
+                      />
+                      <circle 
+                        cx="50" 
+                        cy="50" 
+                        r="45" 
+                        fill="none" 
+                        stroke="#4ade80" 
+                        strokeWidth="10" 
+                        strokeDasharray={`${(0.1 * Math.PI * 90)} ${2 * Math.PI * 45}`} 
+                        strokeDashoffset={`${-0.2 * Math.PI * 90}`} 
+                        transform="rotate(-90 50 50)"
+                      />
+                      <circle 
+                        cx="50" 
+                        cy="50" 
+                        r="45" 
+                        fill="none" 
+                        stroke="#fdba74" 
+                        strokeWidth="10" 
+                        strokeDasharray={`${(0.15 * Math.PI * 90)} ${2 * Math.PI * 45}`} 
+                        strokeDashoffset={`${-0.3 * Math.PI * 90}`} 
+                        transform="rotate(-90 50 50)"
+                      />
+                      <circle 
+                        cx="50" 
+                        cy="50" 
+                        r="45" 
+                        fill="none" 
+                        stroke="#fca5a5" 
+                        strokeWidth="10" 
+                        strokeDasharray={`${(0.15 * Math.PI * 90)} ${2 * Math.PI * 45}`} 
+                        strokeDashoffset={`${-0.45 * Math.PI * 90}`} 
+                        transform="rotate(-90 50 50)"
+                      />
+                    </svg>
+                  </div>
+                  
+                  {/* Center text */}
+                  <div className="text-center z-10">
+                    <div className="text-3xl font-bold">{heartRateZones.maxHR}</div>
+                    <div className="text-sm text-gray-500">Max HR</div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="mt-6 text-xs">
+                <div className="grid grid-cols-5 gap-2 text-center">
+                  <div>
+                    <div className="h-3 bg-blue-200 rounded-full mb-1"></div>
+                    <span>Rest</span>
+                  </div>
+                  <div>
+                    <div className="h-3 bg-green-200 rounded-full mb-1"></div>
+                    <span>Warm-up</span>
+                  </div>
+                  <div>
+                    <div className="h-3 bg-green-500 rounded-full mb-1"></div>
+                    <span>Fat Burn</span>
+                  </div>
+                  <div>
+                    <div className="h-3 bg-orange-300 rounded-full mb-1"></div>
+                    <span>Cardio</span>
+                  </div>
+                  <div>
+                    <div className="h-3 bg-red-300 rounded-full mb-1"></div>
+                    <span>Peak</span>
                   </div>
                 </div>
               </div>
@@ -217,12 +311,6 @@ export default function HeartRateCalculator() {
               </div>
             </CardContent>
           </Card>
-        )}
-        
-        {showResults && (
-          <div className="mt-4">
-            <canvas ref={chartRef} height="300"></canvas>
-          </div>
         )}
       </div>
     </div>

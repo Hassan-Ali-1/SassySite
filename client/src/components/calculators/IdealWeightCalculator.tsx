@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -7,11 +7,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Share2 } from 'lucide-react';
 import { calculateIdealWeight } from '@/lib/calculatorUtils';
-import { createIdealWeightChart } from '@/lib/chartUtils';
-import { Chart, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
-
-// Register ChartJS components
-Chart.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 export default function IdealWeightCalculator() {
   const [height, setHeight] = useState<string>('');
@@ -28,9 +23,6 @@ export default function IdealWeightCalculator() {
   }>(null);
   const [showResults, setShowResults] = useState(false);
 
-  const chartRef = useRef<HTMLCanvasElement>(null);
-  const chartInstanceRef = useRef<Chart | null>(null);
-
   const handleCalculate = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -46,34 +38,35 @@ export default function IdealWeightCalculator() {
     setShowResults(true);
   };
 
-  useEffect(() => {
-    if (showResults && results !== null && chartRef.current) {
-      // Clean up previous chart instance
-      if (chartInstanceRef.current) {
-        chartInstanceRef.current.destroy();
-      }
-      
-      // Create new chart
-      const ctx = chartRef.current.getContext('2d');
-      if (ctx) {
-        chartInstanceRef.current = createIdealWeightChart(
-          ctx, 
-          results.devine, 
-          results.hamwi, 
-          results.robinson, 
-          results.miller, 
-          results.displayUnit
-        );
-      }
+  // Helper function to get formula bar colors
+  const getFormulaColor = (formula: string) => {
+    switch (formula) {
+      case 'devine': return 'bg-blue-500';
+      case 'hamwi': return 'bg-green-500';
+      case 'robinson': return 'bg-purple-500';
+      case 'miller': return 'bg-amber-500';
+      default: return 'bg-gray-500';
     }
+  };
+
+  // Helper function to calculate width percentage based on the weight value
+  const getBarWidth = (value: number) => {
+    if (!results) return '0%';
     
-    // Clean up chart on component unmount
-    return () => {
-      if (chartInstanceRef.current) {
-        chartInstanceRef.current.destroy();
-      }
-    };
-  }, [showResults, results]);
+    // For calculation, find min and max in the results
+    const weights = [results.devine, results.hamwi, results.robinson, results.miller];
+    const minWeight = Math.min(...weights);
+    const maxWeight = Math.max(...weights);
+    const range = maxWeight - minWeight;
+    
+    // Add padding to range
+    const paddedMin = minWeight - (range * 0.2);
+    const paddedMax = maxWeight + (range * 0.2);
+    const paddedRange = paddedMax - paddedMin;
+    
+    // Calculate percentage
+    return `${((value - paddedMin) / paddedRange) * 100}%`;
+  };
 
   return (
     <div className="flex flex-col md:flex-row gap-8">
@@ -173,41 +166,61 @@ export default function IdealWeightCalculator() {
               <h3 className="font-sans font-semibold text-lg mb-2">Your Results</h3>
               
               <div className="mb-6">
-                <div className="flex justify-between mb-2">
+                <div className="flex justify-between mb-4">
                   <span className="text-gray-700">Your Ideal Weight Range:</span>
-                  <span className="font-bold">{results.range}</span>
+                  <span className="font-bold text-xl text-blue-600">{results.range}</span>
                 </div>
                 
-                <div>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span>Formula</span>
-                    <span>Result</span>
-                  </div>
+                <div className="space-y-6 mt-8">
+                  <h4 className="font-sans font-semibold text-gray-700 mb-3">Different Formulas Compared:</h4>
                   
-                  <div className="space-y-2">
-                    <div className="flex justify-between py-2 border-t">
-                      <span>Devine Formula</span>
-                      <span>
-                        {results.devine} {results.displayUnit}
-                      </span>
+                  {/* Formula comparison visualization */}
+                  <div className="relative h-48 mt-2">
+                    {/* Scale marks */}
+                    <div className="absolute bottom-0 left-0 right-0 h-px bg-gray-300 flex justify-between">
+                      {Array.from({ length: 6 }).map((_, i) => (
+                        <div key={i} className="relative">
+                          <div className="absolute bottom-0 w-px h-2 bg-gray-300"></div>
+                          <div className="absolute bottom-4 transform -translate-x-1/2 text-xs text-gray-500">
+                            {Math.round(parseFloat(results.range.split('-')[0]) + i * (parseFloat(results.range.split('-')[1]) - parseFloat(results.range.split('-')[0])) / 5)}
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                    <div className="flex justify-between py-2 border-t">
-                      <span>Hamwi Formula</span>
-                      <span>
-                        {results.hamwi} {results.displayUnit}
-                      </span>
-                    </div>
-                    <div className="flex justify-between py-2 border-t">
-                      <span>Robinson Formula</span>
-                      <span>
-                        {results.robinson} {results.displayUnit}
-                      </span>
-                    </div>
-                    <div className="flex justify-between py-2 border-t">
-                      <span>Miller Formula</span>
-                      <span>
-                        {results.miller} {results.displayUnit}
-                      </span>
+                    
+                    {/* Formula bars */}
+                    <div className="absolute bottom-12 left-0 right-0 space-y-6">
+                      <div className="relative h-5">
+                        <div className="absolute left-0 h-full bg-gray-200 rounded-full" style={{ width: '100%' }}></div>
+                        <div className={`absolute left-0 h-full ${getFormulaColor('devine')} rounded-full`} style={{ width: getBarWidth(results.devine) }}></div>
+                        <div className="absolute right-0 transform translate-x-full ml-2 whitespace-nowrap text-sm">
+                          <span className="font-semibold">Devine:</span> {results.devine} {results.displayUnit}
+                        </div>
+                      </div>
+                      
+                      <div className="relative h-5">
+                        <div className="absolute left-0 h-full bg-gray-200 rounded-full" style={{ width: '100%' }}></div>
+                        <div className={`absolute left-0 h-full ${getFormulaColor('hamwi')} rounded-full`} style={{ width: getBarWidth(results.hamwi) }}></div>
+                        <div className="absolute right-0 transform translate-x-full ml-2 whitespace-nowrap text-sm">
+                          <span className="font-semibold">Hamwi:</span> {results.hamwi} {results.displayUnit}
+                        </div>
+                      </div>
+                      
+                      <div className="relative h-5">
+                        <div className="absolute left-0 h-full bg-gray-200 rounded-full" style={{ width: '100%' }}></div>
+                        <div className={`absolute left-0 h-full ${getFormulaColor('robinson')} rounded-full`} style={{ width: getBarWidth(results.robinson) }}></div>
+                        <div className="absolute right-0 transform translate-x-full ml-2 whitespace-nowrap text-sm">
+                          <span className="font-semibold">Robinson:</span> {results.robinson} {results.displayUnit}
+                        </div>
+                      </div>
+                      
+                      <div className="relative h-5">
+                        <div className="absolute left-0 h-full bg-gray-200 rounded-full" style={{ width: '100%' }}></div>
+                        <div className={`absolute left-0 h-full ${getFormulaColor('miller')} rounded-full`} style={{ width: getBarWidth(results.miller) }}></div>
+                        <div className="absolute right-0 transform translate-x-full ml-2 whitespace-nowrap text-sm">
+                          <span className="font-semibold">Miller:</span> {results.miller} {results.displayUnit}
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -237,12 +250,6 @@ export default function IdealWeightCalculator() {
               </div>
             </CardContent>
           </Card>
-        )}
-        
-        {showResults && (
-          <div className="mt-4">
-            <canvas ref={chartRef} height="250"></canvas>
-          </div>
         )}
       </div>
     </div>

@@ -8,7 +8,6 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Slider } from '@/components/ui/slider';
 import { Share2 } from 'lucide-react';
 import { calculateDailyCalories } from '@/lib/calculatorUtils';
-import { createCalorieChart } from '@/lib/chartUtils';
 import { Chart, ArcElement, Tooltip, Legend } from 'chart.js';
 
 // Register ChartJS components
@@ -33,9 +32,6 @@ export default function CalorieCalculator() {
     deficit: number;
   }>(null);
   const [showResults, setShowResults] = useState(false);
-
-  const chartRef = useRef<HTMLCanvasElement>(null);
-  const chartInstanceRef = useRef<Chart | null>(null);
 
   const activityLevelDescriptions = {
     sedentary: 'Little or no exercise',
@@ -76,32 +72,29 @@ export default function CalorieCalculator() {
     setShowResults(true);
   };
 
-  useEffect(() => {
-    if (showResults && results !== null && chartRef.current) {
-      // Clean up previous chart instance
-      if (chartInstanceRef.current) {
-        chartInstanceRef.current.destroy();
-      }
-      
-      // Create new chart
-      const ctx = chartRef.current.getContext('2d');
-      if (ctx) {
-        chartInstanceRef.current = createCalorieChart(
-          ctx, 
-          results.maintenanceCalories,
-          results.targetCalories,
-          goal
-        );
-      }
-    }
+  const getCalorieBreakdown = () => {
+    if (!results) return [];
     
-    // Clean up chart on component unmount
-    return () => {
-      if (chartInstanceRef.current) {
-        chartInstanceRef.current.destroy();
-      }
-    };
-  }, [showResults, results, goal]);
+    const targetCalories = Math.round(results.targetCalories);
+    
+    // Simplified macro breakdown (rough estimates)
+    const protein = Math.round(targetCalories * 0.3); // 30% protein
+    const fat = Math.round(targetCalories * 0.3);     // 30% fat
+    const carbs = Math.round(targetCalories * 0.4);   // 40% carbs
+    
+    return [
+      { category: 'Protein', calories: protein, color: '#4ade80' },  // green
+      { category: 'Fat', calories: fat, color: '#facc15' },          // yellow
+      { category: 'Carbs', calories: carbs, color: '#60a5fa' }       // blue
+    ];
+  };
+
+  // Get color for the goal
+  const getGoalColor = () => {
+    if (goal === 'lose') return 'text-red-500';
+    if (goal === 'maintain') return 'text-blue-500';
+    return 'text-green-500';
+  };
 
   return (
     <div className="flex flex-col md:flex-row gap-8">
@@ -286,7 +279,7 @@ export default function CalorieCalculator() {
                   <span className="text-gray-700">
                     {goal === 'lose' ? 'Weight Loss' : goal === 'gain' ? 'Weight Gain' : 'Maintenance'} Target:
                   </span>
-                  <span className="font-bold text-xl text-amber-600">{Math.round(results.targetCalories)} calories/day</span>
+                  <span className={`font-bold text-xl ${getGoalColor()}`}>{Math.round(results.targetCalories)} calories/day</span>
                 </div>
                 
                 {goal !== 'maintain' && (
@@ -295,6 +288,30 @@ export default function CalorieCalculator() {
                     <span className="font-medium">{Math.abs(Math.round(results.deficit))} calories</span>
                   </div>
                 )}
+              </div>
+              
+              {/* Custom calorie breakdown visualization */}
+              <div className="mt-6">
+                <h4 className="font-sans font-semibold text-sm mb-3">Suggested Macronutrient Breakdown</h4>
+                <div className="space-y-3">
+                  {getCalorieBreakdown().map((macro, index) => (
+                    <div key={index}>
+                      <div className="flex justify-between text-sm mb-1">
+                        <span>{macro.category}</span>
+                        <span>{macro.calories} calories</span>
+                      </div>
+                      <div className="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full" 
+                          style={{ 
+                            width: `${(macro.calories / Math.round(results.targetCalories)) * 100}%`,
+                            backgroundColor: macro.color
+                          }}
+                        ></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
               
               <div className="mt-6">
@@ -334,14 +351,6 @@ export default function CalorieCalculator() {
               </div>
             </CardContent>
           </Card>
-        )}
-        
-        {showResults && (
-          <div className="mt-4 flex justify-center">
-            <div className="w-64 h-64">
-              <canvas ref={chartRef}></canvas>
-            </div>
-          </div>
         )}
       </div>
     </div>
