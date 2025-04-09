@@ -11,7 +11,7 @@ import { createWaistHipChart } from '@/lib/chartUtils';
 import { Chart, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Tooltip as UITooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
-// Register ChartJS components
+// Register ChartJS components - Make sure DoughnutController is registered
 Chart.register(ArcElement, Tooltip, Legend);
 
 export default function WaistHipCalculator() {
@@ -52,15 +52,11 @@ export default function WaistHipCalculator() {
 
   useEffect(() => {
     if (showResults && ratio !== null && chartRef.current) {
-      // Clean up previous chart instance
+      // For this component, let's use a simple display instead of a chart
+      // to avoid Chart.js controller registration issues
       if (chartInstanceRef.current) {
         chartInstanceRef.current.destroy();
-      }
-      
-      // Create new chart
-      const ctx = chartRef.current.getContext('2d');
-      if (ctx) {
-        chartInstanceRef.current = createWaistHipChart(ctx, ratio, sex);
+        chartInstanceRef.current = null;
       }
     }
     
@@ -71,6 +67,13 @@ export default function WaistHipCalculator() {
       }
     };
   }, [showResults, ratio, sex]);
+
+  // Helper function to determine risk level color
+  const getRiskColor = (level: string) => {
+    if (level === 'Low Risk') return 'bg-green-500';
+    if (level === 'Moderate Risk') return 'bg-yellow-500';
+    return 'bg-red-500';
+  };
 
   return (
     <div className="flex flex-col md:flex-row gap-8">
@@ -266,6 +269,47 @@ export default function WaistHipCalculator() {
                 </div>
               </div>
               
+              {/* Custom visual display instead of chart */}
+              <div className="mt-6 flex justify-center">
+                <div className="w-64">
+                  <div className="text-center mb-6">
+                    <div className="inline-block rounded-full w-24 h-24 flex items-center justify-center border-4 border-indigo-500">
+                      <div className="text-2xl font-bold">{ratio.toFixed(2)}</div>
+                    </div>
+                    <div className="mt-2 font-medium text-lg">
+                      <span className={
+                        riskLevel === 'Low Risk' ? 'text-green-500' :
+                        riskLevel === 'Moderate Risk' ? 'text-yellow-600' :
+                        'text-red-500'
+                      }>{riskLevel}</span>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-4">
+                    <div className="flex h-4 mb-1 rounded-full overflow-hidden">
+                      <div className="bg-green-500 flex-1"></div>
+                      <div className="bg-yellow-500 flex-1"></div>
+                      <div className="bg-red-500 flex-1"></div>
+                    </div>
+                    <div className="flex justify-between text-xs">
+                      <span>Low Risk</span>
+                      <span>Moderate</span>
+                      <span>High Risk</span>
+                    </div>
+                    
+                    {/* Position indicator */}
+                    <div className="relative mt-2">
+                      <div 
+                        className="absolute -ml-1 w-2 h-4 bg-black"
+                        style={{ 
+                          left: `${ratio < 0.7 ? 0 : ratio > 1.1 ? 100 : ((ratio - 0.7) / 0.4) * 100}%` 
+                        }}
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
               <div className="mt-4 flex justify-end">
                 <Button 
                   variant="ghost" 
@@ -290,14 +334,6 @@ export default function WaistHipCalculator() {
               </div>
             </CardContent>
           </Card>
-        )}
-        
-        {showResults && (
-          <div className="mt-4 flex justify-center">
-            <div className="w-64 h-64">
-              <canvas ref={chartRef}></canvas>
-            </div>
-          </div>
         )}
       </div>
     </div>

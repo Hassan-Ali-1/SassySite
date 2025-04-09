@@ -12,12 +12,11 @@ import {
   calculateBodyFatNavy, 
   getBodyFatCategory 
 } from '@/lib/calculatorUtils';
-import { createBodyFatChart } from '@/lib/chartUtils';
-import { Chart, ArcElement, Tooltip, Legend } from 'chart.js';
+import { Chart, CategoryScale, LinearScale, BarElement, ArcElement, Title, Tooltip, Legend } from 'chart.js';
 import { Tooltip as UITooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 // Register ChartJS components
-Chart.register(ArcElement, Tooltip, Legend);
+Chart.register(CategoryScale, LinearScale, BarElement, ArcElement, Title, Tooltip, Legend);
 
 export default function BodyFatCalculator() {
   const [method, setMethod] = useState<'skinfold' | 'navy'>('navy');
@@ -40,9 +39,6 @@ export default function BodyFatCalculator() {
   const [bodyFatPercentage, setBodyFatPercentage] = useState<number | null>(null);
   const [bodyFatCategory, setBodyFatCategory] = useState<string>('');
   const [showResults, setShowResults] = useState(false);
-
-  const chartRef = useRef<HTMLCanvasElement>(null);
-  const chartInstanceRef = useRef<Chart | null>(null);
 
   const handleCalculate = (e: React.FormEvent) => {
     e.preventDefault();
@@ -100,27 +96,23 @@ export default function BodyFatCalculator() {
     setShowResults(true);
   };
 
-  useEffect(() => {
-    if (showResults && bodyFatPercentage !== null && chartRef.current) {
-      // Clean up previous chart instance
-      if (chartInstanceRef.current) {
-        chartInstanceRef.current.destroy();
-      }
-      
-      // Create new chart
-      const ctx = chartRef.current.getContext('2d');
-      if (ctx) {
-        chartInstanceRef.current = createBodyFatChart(ctx, bodyFatPercentage, sex);
-      }
-    }
-    
-    // Clean up chart on component unmount
-    return () => {
-      if (chartInstanceRef.current) {
-        chartInstanceRef.current.destroy();
-      }
-    };
-  }, [showResults, bodyFatPercentage, sex]);
+  // Get category color based on the body fat category
+  const getCategoryColor = () => {
+    if (bodyFatCategory === 'Essential Fat') return 'bg-blue-500';
+    if (bodyFatCategory === 'Athletes') return 'bg-green-500';
+    if (bodyFatCategory === 'Fitness') return 'bg-green-300';
+    if (bodyFatCategory === 'Average') return 'bg-yellow-500';
+    return 'bg-red-500';
+  }
+
+  // Get text color based on the body fat category
+  const getCategoryTextColor = () => {
+    if (bodyFatCategory === 'Essential Fat') return 'text-blue-500';
+    if (bodyFatCategory === 'Athletes') return 'text-green-500';
+    if (bodyFatCategory === 'Fitness') return 'text-green-600';
+    if (bodyFatCategory === 'Average') return 'text-yellow-600';
+    return 'text-red-500';
+  }
 
   return (
     <div className="flex flex-col md:flex-row gap-8">
@@ -432,13 +424,7 @@ export default function BodyFatCalculator() {
               
               <div className="mb-6">
                 <h4 className="font-sans font-semibold mb-2">
-                  Category: <span className={
-                    bodyFatCategory === 'Essential Fat' ? 'text-blue-500' :
-                    bodyFatCategory === 'Athletes' ? 'text-green-500' :
-                    bodyFatCategory === 'Fitness' ? 'text-green-600' :
-                    bodyFatCategory === 'Average' ? 'text-yellow-600' :
-                    'text-red-500'
-                  }>{bodyFatCategory}</span>
+                  Category: <span className={getCategoryTextColor()}>{bodyFatCategory}</span>
                 </h4>
                 
                 <p className="text-gray-600 text-sm">
@@ -453,6 +439,49 @@ export default function BodyFatCalculator() {
                     'This range represents excess body fat and may increase health risks. Gradual reduction through lifestyle changes is recommended.'
                   }
                 </p>
+              </div>
+              
+              {/* Custom visual display instead of chart */}
+              <div className="mt-6 flex justify-center">
+                <div className="w-64">
+                  <div className="text-center mb-6">
+                    <div className={`inline-block rounded-full w-24 h-24 flex items-center justify-center border-4 ${getCategoryColor().replace('bg-', 'border-')}`}>
+                      <div className="text-2xl font-bold">{bodyFatPercentage}%</div>
+                    </div>
+                    <div className="mt-2 font-medium text-lg">
+                      <span className={getCategoryTextColor()}>{bodyFatCategory}</span>
+                    </div>
+                  </div>
+                  
+                  {/* Body fat ranges visualization */}
+                  <div className="mt-6">
+                    <h5 className="font-semibold text-sm mb-2 text-center">Body Fat Ranges for {sex === 'male' ? 'Men' : 'Women'}</h5>
+                    <div className="flex h-4 mb-1 rounded-full overflow-hidden">
+                      <div className="bg-blue-500 w-1/5"></div>
+                      <div className="bg-green-500 w-1/5"></div>
+                      <div className="bg-green-300 w-1/5"></div>
+                      <div className="bg-yellow-500 w-1/5"></div>
+                      <div className="bg-red-500 w-1/5"></div>
+                    </div>
+                    <div className="flex justify-between text-xs px-1">
+                      <span>Essential</span>
+                      <span>Athletes</span>
+                      <span>Fitness</span>
+                      <span>Average</span>
+                      <span>Obese</span>
+                    </div>
+                    
+                    {/* Position indicator */}
+                    <div className="relative mt-2">
+                      <div 
+                        className="absolute -ml-1 w-2 h-4 bg-black"
+                        style={{ 
+                          left: `${Math.min(Math.max((bodyFatPercentage / (sex === 'male' ? 40 : 45)) * 100, 0), 100)}%` 
+                        }}
+                      ></div>
+                    </div>
+                  </div>
+                </div>
               </div>
               
               <div className="mt-4 flex justify-end">
@@ -479,14 +508,6 @@ export default function BodyFatCalculator() {
               </div>
             </CardContent>
           </Card>
-        )}
-        
-        {showResults && (
-          <div className="mt-4 flex justify-center">
-            <div className="w-64 h-64">
-              <canvas ref={chartRef}></canvas>
-            </div>
-          </div>
         )}
       </div>
     </div>
