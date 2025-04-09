@@ -1,0 +1,120 @@
+Project Goal: Build a visually stunning, user-friendly, and SEO-optimized free micro SaaS website offering a suite of accurate and helpful weight management calculators. The website should be responsive and mobile-friendly, prioritize user privacy by not storing heavy data, and incorporate graphs, visuals, and guides to enhance the user experience. The goal is to provide valuable free tools to attract users and potentially build an audience for future ventures or other non-monetary objectives (e.g., building authority, lead generation for a different free offering).
+
+Target Audience: Individuals who are actively trying to manage their weight, whether for weight loss, weight gain, or maintaining a healthy weight. This includes people interested in understanding their body composition, calorie needs, and setting realistic goals.
+
+Core Functionality (Calculators to Include):
+
+(Same as before)
+
+Ideal Body Weight Calculator:
+
+Input Fields: Height (with unit selection: cm/inches), Sex (Male/Female), optionally Frame Size (Small/Medium/Large).
+Output: Ideal body weight range (with unit selection: kg/lbs) based on multiple formulas (allow user to select or display all common ones like Hamwi, Devine, etc.).
+Visuals: A simple bar graph visually representing the calculated weight range.
+Guide: A brief explanation of what ideal body weight is and the limitations of these calculations.
+Calorie Deficit/Surplus Calculator:
+
+Input Fields: Age, Sex (Male/Female), Height (cm/inches), Current Weight (kg/lbs), Activity Level (dropdown with clear descriptions, e.g., Sedentary, Lightly Active, Moderately Active, Very Active, Extra Active), Goal (Weight Loss/Gain/Maintenance), Target Rate of Weight Change (e.g., 0.5 kg/week, 1 lb/week).
+Output: Estimated daily calorie needs for the selected goal, recommended daily calorie intake with the specified deficit/surplus.
+Visuals: A circular progress bar showing the estimated daily calorie intake compared to a general healthy range (optional).
+Guide: Information on what calorie deficit/surplus means, healthy rates of weight change, and the importance of consulting a professional.
+Target Heart Rate Zone Calculator for Fat Burning:
+
+Input Fields: Age, Resting Heart Rate (optional).
+Output: Target heart rate zone (in beats per minute) for fat burning, calculated using standard formulas.
+Visuals: A horizontal bar graph displaying different heart rate zones (e.g., Warm-up, Fat Burning, Cardio, Peak) with the calculated fat-burning zone highlighted.
+Guide: Explanation of heart rate zones and how to measure heart rate during exercise.
+Body Fat Percentage Calculator:
+
+Input Fields:
+Method Selection: Allow user to choose between "Skinfold Measurements" and "Circumference Measurements".
+Skinfold Measurements (if selected): Sex (Male/Female), Triceps (mm), Subscapular (mm), Suprailiac (mm) (for Jackson/Pollock 3-site method, adjust based on chosen method). Provide clear visual guides on where to measure.
+Circumference Measurements (if selected): Sex (Male/Female), Waist (cm/inches), Hip (cm/inches) (for females), Neck (cm/inches) (for males). Provide clear visual guides on where to measure.
+Output: Estimated body fat percentage.
+Visuals: A gauge chart indicating the calculated body fat percentage and its corresponding category (e.g., Essential Fat, Athletes, Fitness, Acceptable, Overweight, Obese) with color-coding.
+Guide: Explanation of body fat percentage, different categories, and the accuracy of the chosen calculation method.
+Weight Loss/Gain Timeline Estimator:
+
+Input Fields: Current Weight (kg/lbs), Goal Weight (kg/lbs), Daily Calorie Deficit/Surplus (can be pre-filled from the Calorie Calculator).
+Output: Estimated timeline (in weeks/months) to reach the goal weight.
+Visuals: A line graph showing the projected weight change over time.
+Guide: Emphasize that this is an estimate and individual results may vary.
+BMI (Body Mass Index) Calculator with Interpretation:
+
+Input Fields: Height (cm/inches), Weight (kg/lbs).
+Output: Calculated BMI value and its corresponding category (Underweight, Healthy Weight, Overweight, Obese) with a brief explanation of each category.
+Visuals: A simple bar chart showing the BMI value within the different weight categories.
+Guide: Explanation of what BMI is and its limitations.
+Waist-to-Hip Ratio Calculator with Health Risk Assessment:
+
+Input Fields: Waist Circumference (cm/inches), Hip Circumference (cm/inches), Sex (Male/Female).
+Output: Calculated waist-to-hip ratio and an assessment of the associated health risk (e.g., Low, Moderate, High).
+Visuals: A segmented circular chart indicating the risk level based on the calculated ratio and sex.
+Guide: Instructions on how to measure waist and hip circumference accurately and an explanation of the health risks associated with different ratios.
+Website Design & Aesthetics:
+
+(Same as before)
+
+Look and Feel: Clean, modern, trustworthy, and health-focused design. Use a color palette that evokes health and well-being (e.g., greens, blues, light grays, whites).
+Typography: Use clear and readable fonts. Ensure good contrast for accessibility.
+Imagery: Incorporate high-quality, relevant images and icons related to health, nutrition, and fitness. Avoid overly generic stock photos.
+Branding: Consistent use of a logo (if you have one) and brand colors throughout the website.
+Calculator Presentation: Each calculator should be clearly presented with intuitive input fields and easily understandable outputs.
+Responsiveness & Mobile-Friendliness:
+
+(Same as before)
+
+The website must adapt seamlessly to different screen sizes (desktops, tablets, and mobile phones).
+Ensure all elements are touch-friendly on mobile devices.
+Navigation should be intuitive and easy to use on smaller screens (e.g., hamburger menu).
+SEO Optimization:
+
+(Same as before)
+
+Clean and Semantic HTML Structure: Lovable should generate clean code that search engines can easily understand.
+Relevant Keywords: Use relevant keywords related to weight management, calculators, health, and nutrition in page titles, meta descriptions, headings, and content.
+Optimized Images: Use descriptive file names and alt text for all images.
+Fast Loading Speed: Optimize images and website structure for quick loading times.
+Mobile-First Approach: Design with mobile users in mind, which also benefits SEO.
+Clear URL Structure: Use descriptive and user-friendly URLs for each page.
+Data Handling (No Heavy Data Storage):
+
+(Same as before)
+
+Do not store any personally identifiable information (PII) or sensitive health data in a persistent database.
+Calculations should be performed client-side (within the user's browser) whenever possible.
+If temporary storage is needed for a single session, ensure it's handled securely and discarded after the user leaves the page or closes the browser.
+Clearly state your privacy policy regarding data handling (or lack thereof).
+User Experience Enhancements:
+
+(Same as before)
+
+Graphs and Visuals: As specified in the calculator descriptions, use appropriate charts and graphs to make the output data more easily digestible and visually appealing.
+Guides and Explanations: Provide concise and helpful guides explaining the purpose of each calculator, the formulas used (briefly), and how to interpret the results. Use tooltips or expandable sections for these guides.
+Clear Instructions: Make the input fields self-explanatory with clear labels and units.
+Error Handling: Implement basic error handling for invalid inputs.
+Progressive Disclosure: Present information in a way that doesn't overwhelm the user. Start with the essential inputs and outputs, and offer optional details or explanations.
+Free Marketing Strategies to Consider (Integrate into the Website and Promotion):
+
+SEO Focus: As mentioned, heavily optimize the website for relevant keywords so it ranks well in search engine results for terms like "free BMI calculator," "free calorie calculator," etc.
+Content Marketing (Optional but Recommended): Create blog posts or articles around topics related to weight management, explaining the importance of each metric and linking to the relevant calculators. This can attract organic traffic.
+Social Media Sharing: Include easy-to-use social sharing buttons on each calculator page so users can easily share the tools with their friends and followers.
+Guest Blogging: Write articles for other health and fitness websites or blogs and include a link back to your free calculator website.
+Online Communities and Forums: Participate in relevant online communities and forums (e.g., Reddit, Facebook groups) and share your free tools when appropriate and helpful (avoid spamming).
+Email List Building (Optional for Future): Consider offering a free resource (e.g., a weight management guide) in exchange for an email address to build a list for future communication (even if not directly monetized). Clearly state the value proposition.
+Link Building: Reach out to other websites and resources that might find your free calculators valuable and ask for a link back.
+Utilize Free Online Directories and Listings: List your website in relevant free online directories.
+Create Shareable Visuals: Design visually appealing graphics or infographics based on the calculator results or related information and share them on social media platforms like Pinterest and Instagram.
+Specific Instructions for Lovable (Adapt based on Lovable's Interface):
+
+(Same as before, but keep in mind the free nature of the project)
+
+Utilize Lovable's drag-and-drop interface to build the layout of each calculator page.
+Use appropriate components (e.g., input fields, dropdown menus, buttons, text blocks, image elements).
+Implement the calculator logic using Lovable's built-in formula or scripting capabilities (if available). Ensure accuracy of the calculations.
+Use Lovable's styling options to achieve the desired design aesthetics (colors, fonts, spacing, etc.).
+Ensure the website is fully responsive by utilizing Lovable's responsive design features (breakpoints, flexbox/grid layouts).
+Configure SEO settings for each page (title tags, meta descriptions, URL slugs) within Lovable's SEO management tools.
+Embed charting libraries (if Lovable allows) or use its built-in charting components to create the required graphs and visuals.
+Use Lovable's text and media components to add the necessary guides and explanations.
+Integrate social sharing buttons using Lovable's available integrations or by embedding code snippets.
