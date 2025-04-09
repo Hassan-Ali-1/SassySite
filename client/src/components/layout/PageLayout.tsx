@@ -1,6 +1,8 @@
 
 import { ReactNode } from 'react';
 import { Helmet } from 'react-helmet';
+import Header from './Header';
+import Footer from './Footer';
 
 export interface PageLayoutProps {
   title: string;
@@ -13,7 +15,7 @@ export default function PageLayout({ title, description, children }: PageLayoutP
   const fullTitle = `${title} | ${siteTitle}`;
   
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       <Helmet>
         <title>{fullTitle}</title>
         {description && <meta name="description" content={description} />}
@@ -23,10 +25,16 @@ export default function PageLayout({ title, description, children }: PageLayoutP
         {description && <meta name="twitter:description" content={description} />}
       </Helmet>
       
+      {/* Header */}
+      <Header />
+      
       {/* Content */}
-      <div className="pt-16">
+      <main className="flex-grow">
         {children}
-      </div>
+      </main>
+      
+      {/* Footer */}
+      <Footer />
     </div>
   );
 }
