@@ -1,19 +1,31 @@
 
 import { ReactNode } from 'react';
+import { Helmet } from 'react-helmet';
 
-interface PageLayoutProps {
+export interface PageLayoutProps {
   title: string;
+  description?: string;
   children: ReactNode;
 }
 
-export default function PageLayout({ title, children }: PageLayoutProps) {
+export default function PageLayout({ title, description, children }: PageLayoutProps) {
+  const siteTitle = 'FitCalc';
+  const fullTitle = `${title} | ${siteTitle}`;
+  
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-16">
-        <h1 className="font-sans font-bold text-4xl mb-8 text-center">{title}</h1>
-        <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-sm p-8">
-          {children}
-        </div>
+      <Helmet>
+        <title>{fullTitle}</title>
+        {description && <meta name="description" content={description} />}
+        <meta property="og:title" content={fullTitle} />
+        {description && <meta property="og:description" content={description} />}
+        <meta name="twitter:title" content={fullTitle} />
+        {description && <meta name="twitter:description" content={description} />}
+      </Helmet>
+      
+      {/* Content */}
+      <div className="pt-16">
+        {children}
       </div>
     </div>
   );
