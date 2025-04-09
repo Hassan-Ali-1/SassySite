@@ -1,33 +1,20 @@
+
 import { ReactNode } from 'react';
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
-import { motion } from 'framer-motion';
-import SEO from '@/components/SEO';
 
 interface PageLayoutProps {
   title: string;
   children: ReactNode;
-  description?: string;
 }
 
-export default function PageLayout({ title, description, children }: PageLayoutProps) {
+export default function PageLayout({ title, children }: PageLayoutProps) {
   return (
-    <>
-      <SEO 
-        title={title}
-        description={description || `${title} - FitCalc Free Weight Management Calculators`}
-      />
-      <Header />
-      <main className="min-h-screen">
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5 }}
-        >
+    <div className="min-h-screen bg-gray-50">
+      <div className="container mx-auto px-4 py-16">
+        <h1 className="font-sans font-bold text-4xl mb-8 text-center">{title}</h1>
+        <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-sm p-8">
           {children}
-        </motion.div>
-      </main>
-      <Footer />
-    </>
+        </div>
+      </div>
+    </div>
   );
 }

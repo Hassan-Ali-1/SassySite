@@ -1,5 +1,5 @@
+import { useModal } from '@/contexts/ModalContext';
 import { Button } from '@/components/ui/button';
-import { Link } from 'wouter';
 import { 
   Weight, 
   Scale, 
@@ -13,6 +13,7 @@ import {
 import { motion } from 'framer-motion';
 
 export default function CalculatorSelection() {
+  const { openCalculator } = useModal();
 
   const calculators = [
     {
@@ -113,14 +114,12 @@ export default function CalculatorSelection() {
               <div className="px-6 pb-6">
                 <p className="text-gray-600 mb-6 min-h-[60px]">{calculator.description}</p>
                 <Button 
-                  asChild
+                  onClick={() => openCalculator(calculator.id as any)}
                   variant="default"
                   className={`w-full ${calculator.buttonColor} font-medium flex items-center justify-center gap-2`}
                 >
-                  <Link href={`/calculators/${calculator.id}`}>
-                    Open Calculator
-                    <ArrowRight className="h-4 w-4" />
-                  </Link>
+                  Open Calculator
+                  <ArrowRight className="h-4 w-4" />
                 </Button>
               </div>
             </motion.div>
