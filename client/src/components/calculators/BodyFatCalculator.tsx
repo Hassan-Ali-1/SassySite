@@ -13,11 +13,11 @@ import {
   getBodyFatCategory 
 } from '@/lib/calculatorUtils';
 import { createBodyFatChart } from '@/lib/chartUtils';
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+import { Chart, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Tooltip as UITooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 // Register ChartJS components
-ChartJS.register(ArcElement, Tooltip, Legend);
+Chart.register(ArcElement, Tooltip, Legend);
 
 export default function BodyFatCalculator() {
   const [method, setMethod] = useState<'skinfold' | 'navy'>('navy');
@@ -42,7 +42,7 @@ export default function BodyFatCalculator() {
   const [showResults, setShowResults] = useState(false);
 
   const chartRef = useRef<HTMLCanvasElement>(null);
-  const chartInstanceRef = useRef<ChartJS | null>(null);
+  const chartInstanceRef = useRef<Chart | null>(null);
 
   const handleCalculate = (e: React.FormEvent) => {
     e.preventDefault();
@@ -403,17 +403,20 @@ export default function BodyFatCalculator() {
               Calculate Body Fat
             </Button>
           </form>
+          
+          <div className="mt-6">
+            <h4 className="font-sans font-semibold text-gray-700 mb-2">About Body Fat Percentage</h4>
+            <p className="text-gray-600 text-sm">
+              Body fat percentage is the amount of fat mass in your body compared to everything else (muscle, bone, organs, etc). It's a better indicator of health than weight or BMI alone.
+            </p>
+            <p className="text-gray-600 text-sm mt-2">
+              <strong>Navy Method</strong> uses body circumference measurements to estimate body fat percentage.
+            </p>
+            <p className="text-gray-600 text-sm mt-2">
+              <strong>Skinfold Method</strong> uses measurements of skin folds at specific sites to estimate subcutaneous fat.
+            </p>
+          </div>
         </Tabs>
-        
-        <div className="mt-6">
-          <h4 className="font-sans font-semibold text-gray-700 mb-2">About Body Fat Percentage</h4>
-          <p className="text-gray-600 text-sm">
-            Body fat percentage is the total mass of fat divided by total body mass. The {method === 'navy' ? 'circumference' : 'skinfold'} method provides an estimate based on your measurements.
-          </p>
-          <p className="text-gray-600 text-sm mt-2">
-            <strong>Note:</strong> These calculations provide estimates only. For most accurate results, consider methods such as DEXA scans or hydrostatic weighing performed by healthcare professionals.
-          </p>
-        </div>
       </div>
       
       <div className="md:w-1/2">
@@ -423,8 +426,8 @@ export default function BodyFatCalculator() {
               <h3 className="font-sans font-semibold text-lg mb-2">Your Results</h3>
               
               <div className="flex justify-between items-center mb-6">
-                <span className="text-gray-700">Estimated Body Fat:</span>
-                <span className="font-bold text-xl">{bodyFatPercentage.toFixed(1)}%</span>
+                <span className="text-gray-700">Your Body Fat Percentage:</span>
+                <span className="font-bold text-xl">{bodyFatPercentage}%</span>
               </div>
               
               <div className="mb-6">
@@ -439,19 +442,16 @@ export default function BodyFatCalculator() {
                 </h4>
                 
                 <p className="text-gray-600 text-sm">
-                  {sex === 'male' ? (
-                    bodyFatCategory === 'Essential Fat' ? 'This is the minimum level of fat required for basic body functions.' :
-                    bodyFatCategory === 'Athletes' ? 'This range is typical for athletes and those with very active lifestyles.' :
-                    bodyFatCategory === 'Fitness' ? 'This is considered a healthy range with good muscle definition.' :
-                    bodyFatCategory === 'Average' ? 'This is typical for many adults but may indicate room for improvement in fitness.' :
-                    'This level of body fat may increase health risks. Consider consulting a healthcare provider.'
-                  ) : (
-                    bodyFatCategory === 'Essential Fat' ? 'This is the minimum level of fat required for basic body functions.' :
-                    bodyFatCategory === 'Athletes' ? 'This range is typical for female athletes and those with very active lifestyles.' :
-                    bodyFatCategory === 'Fitness' ? 'This is considered a healthy range with good muscle definition.' :
-                    bodyFatCategory === 'Average' ? 'This is typical for many adult women but may indicate room for improvement in fitness.' :
-                    'This level of body fat may increase health risks. Consider consulting a healthcare provider.'
-                  )}
+                  {bodyFatCategory === 'Essential Fat' ? 
+                    'This is the minimum body fat needed for basic physical and physiological health. It is not recommended to have less than this amount.' :
+                    bodyFatCategory === 'Athletes' ?
+                    'This range is typical for athletes and fitness competitors. It represents excellent conditioning but may be difficult to maintain year-round.' :
+                    bodyFatCategory === 'Fitness' ?
+                    'This range represents excellent fitness and is achievable and maintainable for many people with consistent exercise and proper nutrition.' :
+                    bodyFatCategory === 'Average' ?
+                    'This is considered a healthy range for most people, though improvement through regular exercise and balanced nutrition is beneficial.' :
+                    'This range represents excess body fat and may increase health risks. Gradual reduction through lifestyle changes is recommended.'
+                  }
                 </p>
               </div>
               
@@ -461,10 +461,10 @@ export default function BodyFatCalculator() {
                   className="text-red-500 hover:text-red-600 font-medium text-sm flex items-center"
                   onClick={() => {
                     // Share results functionality
-                    const text = `My body fat percentage is ${bodyFatPercentage.toFixed(1)}%. Calculate yours at FitCalc!`;
+                    const text = `My body fat percentage is ${bodyFatPercentage}%. Calculate yours at FitCalc!`;
                     if (navigator.share) {
                       navigator.share({
-                        title: 'My Body Fat Results',
+                        title: 'My Body Fat Percentage Results',
                         text: text,
                         url: window.location.href,
                       });

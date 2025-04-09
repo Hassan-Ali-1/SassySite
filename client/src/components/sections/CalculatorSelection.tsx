@@ -19,31 +19,31 @@ export default function CalculatorSelection() {
       title: 'BMI Calculator',
       description: 'Calculate your Body Mass Index and see where you fall on the BMI scale.',
       icon: <Weight className="h-16 w-16" />,
-      color: 'from-primary-400 to-primary-600',
-      buttonColor: 'bg-primary-500 hover:bg-primary-600'
+      color: 'from-green-500 to-green-600',
+      buttonColor: 'bg-primary hover:bg-primary/90'
     },
     {
       id: 'ideal-weight',
       title: 'Ideal Weight Calculator',
       description: 'Discover your ideal body weight range based on your height and frame size.',
       icon: <Scale className="h-16 w-16" />,
-      color: 'from-secondary-400 to-secondary-600',
-      buttonColor: 'bg-secondary-500 hover:bg-secondary-600'
+      color: 'from-blue-500 to-blue-600',
+      buttonColor: 'bg-blue-500 hover:bg-blue-600'
     },
     {
       id: 'calorie',
       title: 'Calorie Calculator',
       description: 'Calculate your daily calorie needs for weight loss, maintenance, or gain.',
       icon: <Flame className="h-16 w-16" />,
-      color: 'from-accent-500 to-yellow-500',
-      buttonColor: 'bg-accent-500 hover:bg-yellow-600'
+      color: 'from-amber-500 to-yellow-500',
+      buttonColor: 'bg-amber-500 hover:bg-amber-600'
     },
     {
       id: 'body-fat',
       title: 'Body Fat Calculator',
       description: 'Estimate your body fat percentage using different measurement methods.',
       icon: <Percent className="h-16 w-16" />,
-      color: 'from-red-400 to-red-600',
+      color: 'from-red-500 to-red-600',
       buttonColor: 'bg-red-500 hover:bg-red-600'
     },
     {
@@ -51,7 +51,7 @@ export default function CalculatorSelection() {
       title: 'Heart Rate Zone Calculator',
       description: 'Determine your optimal heart rate zones for fat burning and cardio fitness.',
       icon: <Heart className="h-16 w-16" />,
-      color: 'from-pink-400 to-pink-600',
+      color: 'from-pink-500 to-pink-600',
       buttonColor: 'bg-pink-500 hover:bg-pink-600'
     },
     {
@@ -59,7 +59,7 @@ export default function CalculatorSelection() {
       title: 'Weight Timeline Calculator',
       description: 'Plan your weight loss or gain journey with a realistic timeline projection.',
       icon: <Calendar className="h-16 w-16" />,
-      color: 'from-purple-400 to-purple-600',
+      color: 'from-purple-500 to-purple-600',
       buttonColor: 'bg-purple-500 hover:bg-purple-600'
     },
     {
@@ -67,7 +67,7 @@ export default function CalculatorSelection() {
       title: 'Waist-to-Hip Ratio Calculator',
       description: 'Calculate your waist-to-hip ratio and assess potential health risks.',
       icon: <Ruler className="h-16 w-16" />,
-      color: 'from-indigo-400 to-indigo-600',
+      color: 'from-indigo-500 to-indigo-600',
       buttonColor: 'bg-indigo-500 hover:bg-indigo-600'
     }
   ] as const;
@@ -84,7 +84,7 @@ export default function CalculatorSelection() {
           {calculators.map((calculator) => (
             <div 
               key={calculator.id}
-              className="calculator-card bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg"
+              className="calculator-card bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
             >
               <div className={`h-40 bg-gradient-to-r ${calculator.color} flex items-center justify-center text-white`}>
                 {calculator.icon}
@@ -94,7 +94,8 @@ export default function CalculatorSelection() {
                 <p className="text-gray-600 mb-4">{calculator.description}</p>
                 <Button 
                   onClick={() => openCalculator(calculator.id as any)}
-                  className={`w-full text-white font-medium py-2 rounded ${calculator.buttonColor} transition-colors`}
+                  variant="default"
+                  className={`w-full ${calculator.buttonColor}`}
                 >
                   Open Calculator
                 </Button>

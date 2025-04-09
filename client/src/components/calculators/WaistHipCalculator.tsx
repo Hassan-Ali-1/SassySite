@@ -8,11 +8,11 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Share2, Info } from 'lucide-react';
 import { calculateWaistHipRatio, getWaistHipRiskLevel } from '@/lib/calculatorUtils';
 import { createWaistHipChart } from '@/lib/chartUtils';
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+import { Chart, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Tooltip as UITooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 // Register ChartJS components
-ChartJS.register(ArcElement, Tooltip, Legend);
+Chart.register(ArcElement, Tooltip, Legend);
 
 export default function WaistHipCalculator() {
   const [waist, setWaist] = useState<string>('');
@@ -24,7 +24,7 @@ export default function WaistHipCalculator() {
   const [showResults, setShowResults] = useState(false);
 
   const chartRef = useRef<HTMLCanvasElement>(null);
-  const chartInstanceRef = useRef<ChartJS | null>(null);
+  const chartInstanceRef = useRef<Chart | null>(null);
 
   const handleCalculate = (e: React.FormEvent) => {
     e.preventDefault();

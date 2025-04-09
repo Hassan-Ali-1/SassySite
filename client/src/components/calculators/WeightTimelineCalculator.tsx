@@ -9,7 +9,7 @@ import { Share2 } from 'lucide-react';
 import { calculateWeightTimeline } from '@/lib/calculatorUtils';
 import { createWeightTimelineChart } from '@/lib/chartUtils';
 import { 
-  Chart as ChartJS, 
+  Chart, 
   CategoryScale, 
   LinearScale, 
   PointElement, 
@@ -20,7 +20,7 @@ import {
 } from 'chart.js';
 
 // Register ChartJS components
-ChartJS.register(
+Chart.register(
   CategoryScale, 
   LinearScale, 
   PointElement, 
@@ -48,7 +48,7 @@ export default function WeightTimelineCalculator() {
   const [showResults, setShowResults] = useState(false);
 
   const chartRef = useRef<HTMLCanvasElement>(null);
-  const chartInstanceRef = useRef<ChartJS | null>(null);
+  const chartInstanceRef = useRef<Chart | null>(null);
 
   const handleCalculate = (e: React.FormEvent) => {
     e.preventDefault();

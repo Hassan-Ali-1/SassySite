@@ -8,10 +8,10 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Share2 } from 'lucide-react';
 import { calculateIdealWeight } from '@/lib/calculatorUtils';
 import { createIdealWeightChart } from '@/lib/chartUtils';
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
+import { Chart, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 
 // Register ChartJS components
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+Chart.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 export default function IdealWeightCalculator() {
   const [height, setHeight] = useState<string>('');
@@ -29,7 +29,7 @@ export default function IdealWeightCalculator() {
   const [showResults, setShowResults] = useState(false);
 
   const chartRef = useRef<HTMLCanvasElement>(null);
-  const chartInstanceRef = useRef<ChartJS | null>(null);
+  const chartInstanceRef = useRef<Chart | null>(null);
 
   const handleCalculate = (e: React.FormEvent) => {
     e.preventDefault();
@@ -150,7 +150,7 @@ export default function IdealWeightCalculator() {
             </Select>
           </div>
           
-          <Button type="submit" className="w-full bg-secondary text-white font-medium py-2 rounded hover:bg-secondary/90 transition-colors">
+          <Button type="submit" className="w-full bg-blue-500 text-white font-medium py-2 rounded hover:bg-blue-600 transition-colors">
             Calculate Ideal Weight
           </Button>
         </form>
@@ -216,7 +216,7 @@ export default function IdealWeightCalculator() {
               <div className="mt-4 flex justify-end">
                 <Button 
                   variant="ghost" 
-                  className="text-secondary hover:text-secondary/90 font-medium text-sm flex items-center"
+                  className="text-blue-500 hover:text-blue-600 font-medium text-sm flex items-center"
                   onClick={() => {
                     // Share results functionality
                     const text = `My ideal weight range is ${results.range}. Calculate yours at FitCalc!`;

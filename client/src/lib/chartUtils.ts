@@ -70,21 +70,23 @@ export const createBMIChart = (ctx: CanvasRenderingContext2D, bmiValue: number):
 
   // Add annotation for user's BMI
   const bmiPosition = Math.min(bmiValue, 40);
-  const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-  gradient.addColorStop(0, 'rgba(0, 0, 0, 0.8)');
-  gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+  if (ctx) {
+    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(0, 'rgba(0, 0, 0, 0.8)');
+    gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
-  ctx.beginPath();
-  ctx.moveTo(chart.scales.x.getPixelForValue(bmiPosition), chart.chartArea.top);
-  ctx.lineTo(chart.scales.x.getPixelForValue(bmiPosition), chart.chartArea.bottom);
-  ctx.lineWidth = 2;
-  ctx.strokeStyle = 'rgba(0, 0, 0, 0.8)';
-  ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(chart.scales['x'].getPixelForValue(bmiPosition), chart.chartArea.top);
+    ctx.lineTo(chart.scales['x'].getPixelForValue(bmiPosition), chart.chartArea.bottom);
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.8)';
+    ctx.stroke();
 
-  // Add BMI value text
-  ctx.textAlign = 'center';
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-  ctx.fillText(`Your BMI: ${bmiValue}`, chart.scales.x.getPixelForValue(bmiPosition), chart.chartArea.top - 10);
+    // Add BMI value text
+    ctx.textAlign = 'center';
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+    ctx.fillText(`Your BMI: ${bmiValue}`, chart.scales['x'].getPixelForValue(bmiPosition), chart.chartArea.top - 10);
+  }
 
   return chart;
 };
@@ -278,16 +280,18 @@ export const createBodyFatChart = (
     options
   });
 
-  // Add body fat percentage in the center
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillStyle = userCategory.color.replace('0.5', '1');
-  ctx.font = 'bold 24px Arial';
-  ctx.fillText(`${bodyFatPercentage}%`, chart.width / 2, chart.height / 2 - 15);
-  
-  ctx.font = '14px Arial';
-  ctx.fillStyle = '#666';
-  ctx.fillText(userCategory.name, chart.width / 2, chart.height / 2 + 15);
+  if (ctx) {
+    // Add body fat percentage in the center
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = userCategory.color.replace('0.5', '1');
+    ctx.font = 'bold 24px Arial';
+    ctx.fillText(`${bodyFatPercentage}%`, chart.width / 2, chart.height / 2 - 15);
+    
+    ctx.font = '14px Arial';
+    ctx.fillStyle = '#666';
+    ctx.fillText(userCategory.name, chart.width / 2, chart.height / 2 + 15);
+  }
 
   return chart;
 };
@@ -502,16 +506,18 @@ export const createWaistHipChart = (
     options
   });
 
-  // Add WHR value in the center
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillStyle = userRiskLevel.color.replace('0.5', '1');
-  ctx.font = 'bold 24px Arial';
-  ctx.fillText(ratio.toFixed(2), chart.width / 2, chart.height / 2 - 15);
-  
-  ctx.font = '14px Arial';
-  ctx.fillStyle = '#666';
-  ctx.fillText(userRiskLevel.name, chart.width / 2, chart.height / 2 + 15);
+  if (ctx) {
+    // Add WHR value in the center
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = userRiskLevel.color.replace('0.5', '1');
+    ctx.font = 'bold 24px Arial';
+    ctx.fillText(ratio.toFixed(2), chart.width / 2, chart.height / 2 - 15);
+    
+    ctx.font = '14px Arial';
+    ctx.fillStyle = '#666';
+    ctx.fillText(userRiskLevel.name, chart.width / 2, chart.height / 2 + 15);
+  }
 
   return chart;
 };

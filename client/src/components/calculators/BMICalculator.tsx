@@ -8,10 +8,10 @@ import { Progress } from '@/components/ui/progress';
 import { Share2 } from 'lucide-react';
 import { calculateBMI, getBMICategory, getBMICategoryDescription } from '@/lib/calculatorUtils';
 import { createBMIChart } from '@/lib/chartUtils';
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
+import { Chart, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 
 // Register ChartJS components
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+Chart.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 export default function BMICalculator() {
   const [height, setHeight] = useState<string>('');
@@ -24,7 +24,7 @@ export default function BMICalculator() {
   const [showResults, setShowResults] = useState(false);
 
   const chartRef = useRef<HTMLCanvasElement>(null);
-  const chartInstanceRef = useRef<ChartJS | null>(null);
+  const chartInstanceRef = useRef<Chart | null>(null);
 
   const handleCalculate = (e: React.FormEvent) => {
     e.preventDefault();

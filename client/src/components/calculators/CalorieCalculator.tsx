@@ -9,10 +9,10 @@ import { Slider } from '@/components/ui/slider';
 import { Share2 } from 'lucide-react';
 import { calculateDailyCalories } from '@/lib/calculatorUtils';
 import { createCalorieChart } from '@/lib/chartUtils';
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+import { Chart, ArcElement, Tooltip, Legend } from 'chart.js';
 
 // Register ChartJS components
-ChartJS.register(ArcElement, Tooltip, Legend);
+Chart.register(ArcElement, Tooltip, Legend);
 
 type ActivityLevel = 'sedentary' | 'light' | 'moderate' | 'active' | 'very-active';
 type Goal = 'lose' | 'maintain' | 'gain';
@@ -35,7 +35,7 @@ export default function CalorieCalculator() {
   const [showResults, setShowResults] = useState(false);
 
   const chartRef = useRef<HTMLCanvasElement>(null);
-  const chartInstanceRef = useRef<ChartJS | null>(null);
+  const chartInstanceRef = useRef<Chart | null>(null);
 
   const activityLevelDescriptions = {
     sedentary: 'Little or no exercise',
@@ -264,7 +264,7 @@ export default function CalorieCalculator() {
             </div>
           )}
           
-          <Button type="submit" className="w-full bg-accent-500 text-white font-medium py-2 rounded hover:bg-yellow-600 transition-colors">
+          <Button type="submit" className="w-full bg-amber-500 text-white font-medium py-2 rounded hover:bg-amber-600 transition-colors">
             Calculate Calories
           </Button>
         </form>
@@ -286,7 +286,7 @@ export default function CalorieCalculator() {
                   <span className="text-gray-700">
                     {goal === 'lose' ? 'Weight Loss' : goal === 'gain' ? 'Weight Gain' : 'Maintenance'} Target:
                   </span>
-                  <span className="font-bold text-xl text-primary">{Math.round(results.targetCalories)} calories/day</span>
+                  <span className="font-bold text-xl text-amber-600">{Math.round(results.targetCalories)} calories/day</span>
                 </div>
                 
                 {goal !== 'maintain' && (

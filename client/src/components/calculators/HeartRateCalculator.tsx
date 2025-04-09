@@ -6,10 +6,10 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Share2 } from 'lucide-react';
 import { calculateHeartRateZones } from '@/lib/calculatorUtils';
 import { createHeartRateChart } from '@/lib/chartUtils';
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
+import { Chart, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 
 // Register ChartJS components
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+Chart.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 interface HeartRateZones {
   maxHR: number;
@@ -29,7 +29,7 @@ export default function HeartRateCalculator() {
   const [showResults, setShowResults] = useState(false);
 
   const chartRef = useRef<HTMLCanvasElement>(null);
-  const chartInstanceRef = useRef<ChartJS | null>(null);
+  const chartInstanceRef = useRef<Chart | null>(null);
 
   const handleCalculate = (e: React.FormEvent) => {
     e.preventDefault();
