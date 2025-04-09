@@ -1,0 +1,42 @@
+import { Switch, Route } from "wouter";
+import { queryClient } from "./lib/queryClient";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { Toaster } from "@/components/ui/toaster";
+import NotFound from "@/pages/not-found";
+import Home from "@/pages/Home";
+import { ModalProvider } from "./contexts/ModalContext";
+import { Helmet } from "react-helmet";
+
+function Router() {
+  return (
+    <Switch>
+      <Route path="/" component={Home} />
+      <Route component={NotFound} />
+    </Switch>
+  );
+}
+
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <ModalProvider>
+        <Helmet>
+          <title>FitCalc - Free Weight Management Calculators</title>
+          <meta name="description" content="Free weight management calculators for tracking your health goals. Calculate BMI, ideal weight, calorie needs, body fat percentage and more." />
+          <meta name="keywords" content="weight management, calculators, BMI, ideal weight, body fat, calorie calculator, weight loss" />
+          <meta name="author" content="FitCalc" />
+          <meta property="og:title" content="FitCalc - Free Weight Management Calculators" />
+          <meta property="og:description" content="Free weight management calculators for tracking your health goals." />
+          <meta property="og:type" content="website" />
+          <meta name="twitter:card" content="summary_large_image" />
+          <meta name="twitter:title" content="FitCalc - Free Weight Management Calculators" />
+          <meta name="twitter:description" content="Free weight management calculators for tracking your health goals." />
+        </Helmet>
+        <Router />
+        <Toaster />
+      </ModalProvider>
+    </QueryClientProvider>
+  );
+}
+
+export default App;

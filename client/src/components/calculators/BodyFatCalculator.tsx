@@ -1,0 +1,494 @@
+import { useState, useRef, useEffect } from 'react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Card, CardContent } from '@/components/ui/card';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Share2, Info } from 'lucide-react';
+import { 
+  calculateBodyFatSkinfold, 
+  calculateBodyFatNavy, 
+  getBodyFatCategory 
+} from '@/lib/calculatorUtils';
+import { createBodyFatChart } from '@/lib/chartUtils';
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+import { Tooltip as UITooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+
+// Register ChartJS components
+ChartJS.register(ArcElement, Tooltip, Legend);
+
+export default function BodyFatCalculator() {
+  const [method, setMethod] = useState<'skinfold' | 'navy'>('navy');
+  const [sex, setSex] = useState<'male' | 'female'>('male');
+  
+  // Navy method measurements
+  const [waist, setWaist] = useState<string>('');
+  const [hip, setHip] = useState<string>('');
+  const [neck, setNeck] = useState<string>('');
+  const [measureUnit, setMeasureUnit] = useState<'cm' | 'inches'>('cm');
+  const [height, setHeight] = useState<string>('');
+  const [heightUnit, setHeightUnit] = useState<'cm' | 'inches'>('cm');
+  
+  // Skinfold method measurements
+  const [tricep, setTricep] = useState<string>('');
+  const [subscapular, setSubscapular] = useState<string>('');
+  const [suprailiac, setSuprailiac] = useState<string>('');
+  
+  // Results
+  const [bodyFatPercentage, setBodyFatPercentage] = useState<number | null>(null);
+  const [bodyFatCategory, setBodyFatCategory] = useState<string>('');
+  const [showResults, setShowResults] = useState(false);
+
+  const chartRef = useRef<HTMLCanvasElement>(null);
+  const chartInstanceRef = useRef<ChartJS | null>(null);
+
+  const handleCalculate = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    let calculatedBodyFat: number;
+    
+    if (method === 'navy') {
+      const waistValue = parseFloat(waist);
+      const neckValue = parseFloat(neck);
+      const heightValue = parseFloat(height);
+      let hipValue = sex === 'female' ? parseFloat(hip) : 0;
+      
+      if (
+        isNaN(waistValue) || isNaN(neckValue) || isNaN(heightValue) || 
+        (sex === 'female' && isNaN(hipValue)) ||
+        waistValue <= 0 || neckValue <= 0 || heightValue <= 0 || 
+        (sex === 'female' && hipValue <= 0)
+      ) {
+        alert('Please enter valid measurements.');
+        return;
+      }
+      
+      calculatedBodyFat = calculateBodyFatNavy(
+        sex, 
+        waistValue, 
+        neckValue, 
+        hipValue, 
+        heightValue, 
+        measureUnit, 
+        heightUnit
+      );
+    } else {
+      const tricepValue = parseFloat(tricep);
+      const subscapularValue = parseFloat(subscapular);
+      const suprailiacValue = parseFloat(suprailiac);
+      
+      if (
+        isNaN(tricepValue) || isNaN(subscapularValue) || isNaN(suprailiacValue) ||
+        tricepValue <= 0 || subscapularValue <= 0 || suprailiacValue <= 0
+      ) {
+        alert('Please enter valid skinfold measurements.');
+        return;
+      }
+      
+      calculatedBodyFat = calculateBodyFatSkinfold(
+        sex, 
+        tricepValue, 
+        subscapularValue, 
+        suprailiacValue
+      );
+    }
+    
+    setBodyFatPercentage(calculatedBodyFat);
+    setBodyFatCategory(getBodyFatCategory(calculatedBodyFat, sex));
+    setShowResults(true);
+  };
+
+  useEffect(() => {
+    if (showResults && bodyFatPercentage !== null && chartRef.current) {
+      // Clean up previous chart instance
+      if (chartInstanceRef.current) {
+        chartInstanceRef.current.destroy();
+      }
+      
+      // Create new chart
+      const ctx = chartRef.current.getContext('2d');
+      if (ctx) {
+        chartInstanceRef.current = createBodyFatChart(ctx, bodyFatPercentage, sex);
+      }
+    }
+    
+    // Clean up chart on component unmount
+    return () => {
+      if (chartInstanceRef.current) {
+        chartInstanceRef.current.destroy();
+      }
+    };
+  }, [showResults, bodyFatPercentage, sex]);
+
+  return (
+    <div className="flex flex-col md:flex-row gap-8">
+      <div className="md:w-1/2">
+        <h3 className="font-sans font-semibold text-lg mb-4">Calculate Your Body Fat Percentage</h3>
+        
+        <Tabs defaultValue="navy" value={method} onValueChange={(value) => setMethod(value as 'skinfold' | 'navy')}>
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="navy">Circumference Method</TabsTrigger>
+            <TabsTrigger value="skinfold">Skinfold Method</TabsTrigger>
+          </TabsList>
+          
+          <form onSubmit={handleCalculate} className="space-y-4 mt-4">
+            <div>
+              <Label htmlFor="body-fat-sex">Sex</Label>
+              <RadioGroup 
+                id="body-fat-sex" 
+                value={sex} 
+                onValueChange={(value) => setSex(value as 'male' | 'female')}
+                className="flex space-x-4 mt-2"
+              >
+                <div className="flex-1 border rounded p-3 cursor-pointer hover:bg-gray-50">
+                  <RadioGroupItem value="male" id="body-fat-male" className="mr-2" />
+                  <Label htmlFor="body-fat-male">Male</Label>
+                </div>
+                <div className="flex-1 border rounded p-3 cursor-pointer hover:bg-gray-50">
+                  <RadioGroupItem value="female" id="body-fat-female" className="mr-2" />
+                  <Label htmlFor="body-fat-female">Female</Label>
+                </div>
+              </RadioGroup>
+            </div>
+            
+            <TabsContent value="navy" className="space-y-4 pt-2">
+              <div>
+                <div className="flex items-center">
+                  <Label htmlFor="body-fat-waist">Waist Circumference</Label>
+                  <TooltipProvider>
+                    <UITooltip>
+                      <TooltipTrigger asChild>
+                        <Info className="h-4 w-4 ml-2 text-gray-400" />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Measure at the narrowest point, typically around the navel</p>
+                      </TooltipContent>
+                    </UITooltip>
+                  </TooltipProvider>
+                </div>
+                <div className="flex space-x-4 mt-2">
+                  <div className="flex-1">
+                    <Input
+                      id="body-fat-waist"
+                      type="number"
+                      min="1"
+                      placeholder="Waist"
+                      value={waist}
+                      onChange={(e) => setWaist(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="w-24">
+                    <Select 
+                      value={measureUnit} 
+                      onValueChange={(value) => setMeasureUnit(value as 'cm' | 'inches')}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Unit" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="cm">cm</SelectItem>
+                        <SelectItem value="inches">inches</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+
+              {sex === 'female' && (
+                <div>
+                  <div className="flex items-center">
+                    <Label htmlFor="body-fat-hip">Hip Circumference</Label>
+                    <TooltipProvider>
+                      <UITooltip>
+                        <TooltipTrigger asChild>
+                          <Info className="h-4 w-4 ml-2 text-gray-400" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Measure at the widest point around the buttocks</p>
+                        </TooltipContent>
+                      </UITooltip>
+                    </TooltipProvider>
+                  </div>
+                  <div className="flex space-x-4 mt-2">
+                    <div className="flex-1">
+                      <Input
+                        id="body-fat-hip"
+                        type="number"
+                        min="1"
+                        placeholder="Hip"
+                        value={hip}
+                        onChange={(e) => setHip(e.target.value)}
+                        required
+                      />
+                    </div>
+                    <div className="w-24">
+                      <Select 
+                        value={measureUnit} 
+                        onValueChange={(value) => setMeasureUnit(value as 'cm' | 'inches')}
+                        disabled
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Unit" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="cm">cm</SelectItem>
+                          <SelectItem value="inches">inches</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div>
+                <div className="flex items-center">
+                  <Label htmlFor="body-fat-neck">Neck Circumference</Label>
+                  <TooltipProvider>
+                    <UITooltip>
+                      <TooltipTrigger asChild>
+                        <Info className="h-4 w-4 ml-2 text-gray-400" />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Measure at the narrowest point, just below the Adam's apple</p>
+                      </TooltipContent>
+                    </UITooltip>
+                  </TooltipProvider>
+                </div>
+                <div className="flex space-x-4 mt-2">
+                  <div className="flex-1">
+                    <Input
+                      id="body-fat-neck"
+                      type="number"
+                      min="1"
+                      placeholder="Neck"
+                      value={neck}
+                      onChange={(e) => setNeck(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="w-24">
+                    <Select 
+                      value={measureUnit} 
+                      onValueChange={(value) => setMeasureUnit(value as 'cm' | 'inches')}
+                      disabled
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Unit" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="cm">cm</SelectItem>
+                        <SelectItem value="inches">inches</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="body-fat-height">Height</Label>
+                <div className="flex space-x-4 mt-2">
+                  <div className="flex-1">
+                    <Input
+                      id="body-fat-height"
+                      type="number"
+                      min="1"
+                      placeholder="Height"
+                      value={height}
+                      onChange={(e) => setHeight(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="w-24">
+                    <Select 
+                      value={heightUnit} 
+                      onValueChange={(value) => setHeightUnit(value as 'cm' | 'inches')}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Unit" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="cm">cm</SelectItem>
+                        <SelectItem value="inches">inches</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="skinfold" className="space-y-4 pt-2">
+              <div>
+                <div className="flex items-center">
+                  <Label htmlFor="body-fat-tricep">Tricep Skinfold (mm)</Label>
+                  <TooltipProvider>
+                    <UITooltip>
+                      <TooltipTrigger asChild>
+                        <Info className="h-4 w-4 ml-2 text-gray-400" />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Measure vertically at the midpoint between the shoulder and elbow</p>
+                      </TooltipContent>
+                    </UITooltip>
+                  </TooltipProvider>
+                </div>
+                <Input
+                  id="body-fat-tricep"
+                  type="number"
+                  min="1"
+                  placeholder="Tricep measurement in mm"
+                  value={tricep}
+                  onChange={(e) => setTricep(e.target.value)}
+                  required
+                  className="mt-2"
+                />
+              </div>
+              
+              <div>
+                <div className="flex items-center">
+                  <Label htmlFor="body-fat-subscapular">Subscapular Skinfold (mm)</Label>
+                  <TooltipProvider>
+                    <UITooltip>
+                      <TooltipTrigger asChild>
+                        <Info className="h-4 w-4 ml-2 text-gray-400" />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Measure at a 45° angle just below the shoulder blade</p>
+                      </TooltipContent>
+                    </UITooltip>
+                  </TooltipProvider>
+                </div>
+                <Input
+                  id="body-fat-subscapular"
+                  type="number"
+                  min="1"
+                  placeholder="Subscapular measurement in mm"
+                  value={subscapular}
+                  onChange={(e) => setSubscapular(e.target.value)}
+                  required
+                  className="mt-2"
+                />
+              </div>
+              
+              <div>
+                <div className="flex items-center">
+                  <Label htmlFor="body-fat-suprailiac">Suprailiac Skinfold (mm)</Label>
+                  <TooltipProvider>
+                    <UITooltip>
+                      <TooltipTrigger asChild>
+                        <Info className="h-4 w-4 ml-2 text-gray-400" />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Measure diagonally above the hip bone</p>
+                      </TooltipContent>
+                    </UITooltip>
+                  </TooltipProvider>
+                </div>
+                <Input
+                  id="body-fat-suprailiac"
+                  type="number"
+                  min="1"
+                  placeholder="Suprailiac measurement in mm"
+                  value={suprailiac}
+                  onChange={(e) => setSuprailiac(e.target.value)}
+                  required
+                  className="mt-2"
+                />
+              </div>
+            </TabsContent>
+            
+            <Button type="submit" className="w-full bg-red-500 text-white font-medium py-2 rounded hover:bg-red-600 transition-colors">
+              Calculate Body Fat
+            </Button>
+          </form>
+        </Tabs>
+        
+        <div className="mt-6">
+          <h4 className="font-sans font-semibold text-gray-700 mb-2">About Body Fat Percentage</h4>
+          <p className="text-gray-600 text-sm">
+            Body fat percentage is the total mass of fat divided by total body mass. The {method === 'navy' ? 'circumference' : 'skinfold'} method provides an estimate based on your measurements.
+          </p>
+          <p className="text-gray-600 text-sm mt-2">
+            <strong>Note:</strong> These calculations provide estimates only. For most accurate results, consider methods such as DEXA scans or hydrostatic weighing performed by healthcare professionals.
+          </p>
+        </div>
+      </div>
+      
+      <div className="md:w-1/2">
+        {showResults && bodyFatPercentage !== null && (
+          <Card className="bg-gray-50 mb-4">
+            <CardContent className="p-4">
+              <h3 className="font-sans font-semibold text-lg mb-2">Your Results</h3>
+              
+              <div className="flex justify-between items-center mb-6">
+                <span className="text-gray-700">Estimated Body Fat:</span>
+                <span className="font-bold text-xl">{bodyFatPercentage.toFixed(1)}%</span>
+              </div>
+              
+              <div className="mb-6">
+                <h4 className="font-sans font-semibold mb-2">
+                  Category: <span className={
+                    bodyFatCategory === 'Essential Fat' ? 'text-blue-500' :
+                    bodyFatCategory === 'Athletes' ? 'text-green-500' :
+                    bodyFatCategory === 'Fitness' ? 'text-green-600' :
+                    bodyFatCategory === 'Average' ? 'text-yellow-600' :
+                    'text-red-500'
+                  }>{bodyFatCategory}</span>
+                </h4>
+                
+                <p className="text-gray-600 text-sm">
+                  {sex === 'male' ? (
+                    bodyFatCategory === 'Essential Fat' ? 'This is the minimum level of fat required for basic body functions.' :
+                    bodyFatCategory === 'Athletes' ? 'This range is typical for athletes and those with very active lifestyles.' :
+                    bodyFatCategory === 'Fitness' ? 'This is considered a healthy range with good muscle definition.' :
+                    bodyFatCategory === 'Average' ? 'This is typical for many adults but may indicate room for improvement in fitness.' :
+                    'This level of body fat may increase health risks. Consider consulting a healthcare provider.'
+                  ) : (
+                    bodyFatCategory === 'Essential Fat' ? 'This is the minimum level of fat required for basic body functions.' :
+                    bodyFatCategory === 'Athletes' ? 'This range is typical for female athletes and those with very active lifestyles.' :
+                    bodyFatCategory === 'Fitness' ? 'This is considered a healthy range with good muscle definition.' :
+                    bodyFatCategory === 'Average' ? 'This is typical for many adult women but may indicate room for improvement in fitness.' :
+                    'This level of body fat may increase health risks. Consider consulting a healthcare provider.'
+                  )}
+                </p>
+              </div>
+              
+              <div className="mt-4 flex justify-end">
+                <Button 
+                  variant="ghost" 
+                  className="text-red-500 hover:text-red-600 font-medium text-sm flex items-center"
+                  onClick={() => {
+                    // Share results functionality
+                    const text = `My body fat percentage is ${bodyFatPercentage.toFixed(1)}%. Calculate yours at FitCalc!`;
+                    if (navigator.share) {
+                      navigator.share({
+                        title: 'My Body Fat Results',
+                        text: text,
+                        url: window.location.href,
+                      });
+                    } else {
+                      // Fallback for browsers that don't support navigator.share
+                      window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(window.location.href)}`, '_blank');
+                    }
+                  }}
+                >
+                  <Share2 className="mr-1 h-4 w-4" /> Share Results
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+        
+        {showResults && (
+          <div className="mt-4 flex justify-center">
+            <div className="w-64 h-64">
+              <canvas ref={chartRef}></canvas>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
